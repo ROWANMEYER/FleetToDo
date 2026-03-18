@@ -8,23 +8,36 @@ workflows:
     scripts:
       - name: Install dependencies
         script: npm install
-      - name: Expo Prebuild
-        script: |
-          # This creates/syncs the native android folder from your app.json
-          npx expo prebuild --platform android --no-install
       - name: Generate React Native Bundle
         script: |
-          # Manually ensure the bundle is embedded in the native assets
           mkdir -p android/app/src/main/assets
           npx expo export:embed \
             --platform android \
             --dev false \
-            --dest android/app/src/main/res \
-            --asset-catalog-dest android/app/src/main/assets
+            --bundle-output android/app/src/main/assets/index.android.bundle \
+            --assets-dest android/app/src/main/res
       - name: Build Android APK (Release)
         script: |
           cd android
-          # assembleRelease creates the .apk file
           ./gradlew assembleRelease
     artifacts:
       - android/app/build/outputs/apk/release/*.apk
+
+  react-native-expo-ios-simulator:
+    name: Expo iOS Build (Simulator)
+    max_build_duration: 60
+    instance_type: mac_mini_m1
+    environment:
+      node: latest
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Install dependencies
+        script: npm install
+      - name: Build iOS
+        script: |
+          npx expo prebuild --platform ios
+          xcodebuild -workspace ios/*.xcworkspace -scheme $(node -e "console.log(require('./app.json').expo.name)") -configuration Debug -sdk iphonesimulator
+    artifacts:
+      - ios/build/Build/Products/Debug-iphonesimulator/*.app
+
