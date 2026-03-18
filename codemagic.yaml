@@ -1,6 +1,6 @@
 workflows:
-  react-native-expo-android:
-    name: Expo Android Build
+  react-native-expo-android-release:
+    name: Expo Android Release (APK)
     max_build_duration: 60
     instance_type: mac_mini_m1
     environment:
@@ -8,15 +8,20 @@ workflows:
     scripts:
       - name: Install dependencies
         script: npm install
-      - name: Build Android APK
+      - name: Generate React Native Bundle
         script: |
-          npx expo prebuild --platform android
-          cd android && ./gradlew assembleDebug
+          # Use Expo's built-in export:embed which is what the gradle task calls
+          # but we run it explicitly here to ensure the bundle is created.
+          npx expo export:embed --platform android --dev false --dest android/app/src/main/res --asset-catalog-dest android/app/src/main/assets
+      - name: Build Android APK (Release)
+        script: |
+          cd android
+          ./gradlew assembleRelease
     artifacts:
-      - android/app/build/outputs/apk/debug/*.apk
+      - android/app/build/outputs/apk/release/*.apk
 
-  react-native-expo-ios:
-    name: Expo iOS Build
+  react-native-expo-ios-simulator:
+    name: Expo iOS Build (Simulator)
     max_build_duration: 60
     instance_type: mac_mini_m1
     environment:
@@ -29,7 +34,6 @@ workflows:
       - name: Build iOS
         script: |
           npx expo prebuild --platform ios
-          # Note: This requires a Mac instance and might need more config for code signing if building for real devices
           xcodebuild -workspace ios/*.xcworkspace -scheme $(node -e "console.log(require('./app.json').expo.name)") -configuration Debug -sdk iphonesimulator
     artifacts:
       - ios/build/Build/Products/Debug-iphonesimulator/*.app
