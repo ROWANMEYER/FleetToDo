@@ -2,12 +2,13 @@
   "expo": {
     "name": "FleetToDo",
     "slug": "FleetToDo",
+    "owner": "meyer-rowan53",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/splash_icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,13 +18,23 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
+        "foregroundImage": "./assets/android_icon_foreground.png",
+        "backgroundImage": "./assets/android_icon_background.png",
+        "monochromeImage": "./assets/android_icon_monochrome.png"
+      },
+      "package": "com.rowan_meyer53.FleetToDo"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "scheme": "fleettodo",
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ],
+    "extra": {
+      "router": {},
     }
+    
   }
 }
