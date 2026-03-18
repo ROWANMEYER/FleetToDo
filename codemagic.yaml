@@ -1,0 +1,36 @@
+workflows:
+  react-native-expo-android:
+    name: Expo Android Build
+    max_build_duration: 60
+    instance_type: mac_mini_m1
+    environment:
+      node: latest
+    scripts:
+      - name: Install dependencies
+        script: npm install
+      - name: Build Android APK
+        script: |
+          npx expo prebuild --platform android
+          cd android && ./gradlew assembleDebug
+    artifacts:
+      - android/app/build/outputs/apk/debug/*.apk
+
+  react-native-expo-ios:
+    name: Expo iOS Build
+    max_build_duration: 60
+    instance_type: mac_mini_m1
+    environment:
+      node: latest
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Install dependencies
+        script: npm install
+      - name: Build iOS
+        script: |
+          npx expo prebuild --platform ios
+          # Note: This requires a Mac instance and might need more config for code signing if building for real devices
+          xcodebuild -workspace ios/*.xcworkspace -scheme $(node -e "console.log(require('./app.json').expo.name)") -configuration Debug -sdk iphonesimulator
+    artifacts:
+      - ios/build/Build/Products/Debug-iphonesimulator/*.app
+
